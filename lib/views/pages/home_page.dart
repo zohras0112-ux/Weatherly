@@ -11,8 +11,9 @@ import 'package:weather_app/views/widgets/weather_widget.dart';
 
 class HomePage extends StatefulWidget {
   final String city;
+  final ValueChanged<String> onCityResolved;
 
-  const HomePage({super.key, required this.city});
+  const HomePage({super.key, required this.city, required this.onCityResolved});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -27,6 +28,9 @@ class _HomePageState extends State<HomePage> {
   List<Forecast>? forecast;
   List<HourlyForecast>? hourlyforecast;
 
+  bool isLoading = true;
+  String? errorMessage;
+
   @override
   void initState() {
     super.initState();
@@ -38,14 +42,23 @@ class _HomePageState extends State<HomePage> {
   Future<void> loadWeather(String city) async {
     try {
       final result = await weatherservice.getWeather(city);
+      widget.onCityResolved(result.city);
 
       if (!mounted) return;
 
       setState(() {
         weather = result;
+
+        if (weather != null && forecast != null && hourlyforecast != null) {
+          isLoading = false;
+        }
       });
     } catch (e) {
-      SnackBar(content: Text("Unable to fetch weather :()"));
+      if (!mounted) return;
+      setState(() {
+        errorMessage = e.toString().replaceFirst('Exception: ', '');
+        isLoading = false;
+      });
     }
   }
 
@@ -57,9 +70,16 @@ class _HomePageState extends State<HomePage> {
 
       setState(() {
         forecast = result;
+        if (weather != null && forecast != null && hourlyforecast != null) {
+          isLoading = false;
+        }
       });
     } catch (e) {
-      SnackBar(content: Text("Unable to fetch weather :()"));
+      if (!mounted) return;
+      setState(() {
+        errorMessage = e.toString().replaceFirst('Exception: ', '');
+        isLoading = false;
+      });
     }
   }
 
@@ -71,9 +91,16 @@ class _HomePageState extends State<HomePage> {
 
       setState(() {
         hourlyforecast = result;
+        if (weather != null && forecast != null && hourlyforecast != null) {
+          isLoading = false;
+        }
       });
     } catch (e) {
-      SnackBar(content: Text("Unable to fetch weather :()"));
+      if (!mounted) return;
+      setState(() {
+        errorMessage = e.toString().replaceFirst('Exception: ', '');
+        isLoading = false;
+      });
     }
   }
 
@@ -86,6 +113,9 @@ class _HomePageState extends State<HomePage> {
         weather = null;
         forecast = null;
         hourlyforecast = null;
+
+        isLoading = true;
+        errorMessage = null;
       });
 
       loadWeather(widget.city);
@@ -96,8 +126,20 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (weather == null || forecast == null || hourlyforecast == null) {
+    if (isLoading) {
       return const Center(child: CircularProgressIndicator());
+    }
+    if (errorMessage != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Text(
+            errorMessage!,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 18, color: Colors.red),
+          ),
+        ),
+      );
     }
     return SingleChildScrollView(
       child: Padding(

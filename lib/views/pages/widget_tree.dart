@@ -87,7 +87,14 @@ class _WidgetTreeState extends State<WidgetTree> {
           ),
         ],
       ),
-      body: HomePage(city: city),
+      body: HomePage(
+        city: city,
+        onCityResolved: (resolvedCity) {
+          setState(() {
+            city = resolvedCity;
+          });
+        },
+      ),
     );
   }
 }
