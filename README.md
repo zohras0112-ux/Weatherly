@@ -19,11 +19,8 @@ A clean and responsive weather application built with **Flutter** that provides 
   <img src="screenshots/welcomepage.jpeg" width="220"/>
   <img src="screenshots/homepage.jpeg" width="220"/>
   <img src="screenshots/dark.jpeg" width="220"/>
+  <img src="screenshots/error.jpeg" width="220"/>
 </p>
-
-Error Handling
-
-![Error Handling](screenshots/error.jpeg)
 
 ## 🛠️ Tech Stack
 
